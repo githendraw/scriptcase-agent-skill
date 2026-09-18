@@ -18,7 +18,10 @@ The macros (`sc_lookup`, `sc_select`, `sc_exec_sql`, …) **do not exist in plai
 cannot be run with a normal PHP server; it only runs inside ScriptCase. Locally you can only sanity
 check braces/quotes (a plain `php -l` will choke on `[var]` / `{var}` — that is expected).
 
-A complete, generic copy-ready draft lives in `reference.md` in this skill folder.
+Files in this skill folder:
+- `reference.md` — a complete, generic copy-ready draft.
+- `macros.md` — catalog of blank-app-safe built-in macros (SQL, error, session, navigation,
+  include, date/number, auth) plus runtime objects (`$this->Db`, `$this->Ini`).
 
 ---
 
@@ -185,6 +188,9 @@ Only open a transaction for **write** operations. Never wrap SELECT-only code in
 | `sc_date`, `sc_date_dif`, `sc_time_diff` | date/time helpers |
 | `sc_mail_send`, `sc_log_add`, `sc_include_library` | email / logging / libraries |
 
+For the full list of usable macros (with signatures, categorized), see `macros.md`.
+Only include macros a given app actually needs.
+
 ---
 
 ## 4. Handling form POST inside a Blank app
@@ -334,4 +340,66 @@ $data = get_record($id);        // ScriptCase rewrites the call to a method
 
 See `reference.md` for a full generic draft (globals, dropdown, add/edit, insert/update,
 transaction, escaping, HTML hand-off).
+
+---
+
+## Appendix A. Built-in macros & runtime helpers
+
+Blank apps only run `onExecute`, so only **general** macros apply. Full categorized catalog with
+signatures: `macros.md`. The most useful groups:
+
+**Error / log / warning**
+```php
+sc_error_message("Invalid data.");   // register message
+sc_error_exit();                     // stop execution if a message was registered
+sc_log_add("UPDATE", "item id=$id"); // write to log table
+```
+
+**Session / global & app defaults**
+```php
+sc_set_global($my_value);     // register a session/global value
+sc_reset_global([my_global]); // remove it
+```
+
+**Navigation & messages (JS)**
+```php
+sc_alert("Saved");
+sc_confirm("Delete this record?");
+sc_redir("other_app", "id=" . urlencode($id));   // redirect to an application/URL
+```
+
+**Include & library** (exact parameter options in `macros.md` / editor)
+```php
+sc_include(...);         // File, Source
+sc_include_lib(...);     // Lib1, Lib2, ...
+sc_include_library(...); // Target, Library, File, include_once, Require
+sc_url_library(...);     // Target, Library, File
+```
+
+**Date / number / encoding / language**
+```php
+$d  = sc_date($date, "YYYY-MM-DD", "+", 1, 0, 0);      // add 1 day
+$n  = sc_trunc_num($value, 2);                          // 2 decimals
+$lang = sc_get_language();
+```
+
+**Auth / LDAP / security** (see `macros.md` for signatures)
+```php
+sc_site_ssl;             // true when HTTPS
+sc_ldap_login(...);      // server, version, user, password, dn, group, port, library
+sc_ldap_search(...);     // filter, attributes
+sc_user_logout(...);     // variable_name, variable_content, redirect, target
+```
+
+**Runtime objects**
+- `$this->Db` — ADODB-style connection: `->Execute($sql)`, `->ErrorMsg()`, `->Close()`.
+- `$this->Ini` — app settings: `path_prod`, `path_imagens`, `Nm_lang`, `nm_tpbanco`, …
+- Standard PHP superglobals (`$_POST`, `$_GET`, `$_SESSION`, `$_SERVER`).
+
+**Safe-use rules (avoid bugs)**
+- A connection argument must be a **literal string** — no variables/`[globals]`.
+- Macro signatures vary by ScriptCase version: confirm with **Ctrl+Space** in the SC editor.
+- Use only the macros an app needs; unused/irrelevant macros add risk and noise.
+- Grid/form/button macros (`sc_field_*`, `sc_btn_*`, `sc_label`, `sc_select_where`,
+  `sc_groupby_*`, etc.) have no effect in a blank app — do not use them.
 

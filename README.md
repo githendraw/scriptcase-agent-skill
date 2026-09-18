@@ -12,7 +12,8 @@ client (opencode, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and more).
 ```
 skills/scriptcase/
 ├── SKILL.md        # Main guide
-└── reference.md    # Complete copy-ready draft example
+├── reference.md    # Complete copy-ready draft example
+└── macros.md       # Catalog of blank-app-safe built-in macros
 ```
 
 `SKILL.md` covers:
@@ -22,6 +23,11 @@ skills/scriptcase/
 - SQL macros: `sc_lookup()`, `sc_select()`, `sc_exec_sql()` — result access, scope rules, connections.
 - Transactions, error/alert/redirect macros, form POST add/edit, user-defined functions.
 - Security, debugging, common pitfalls, and a pre-paste checklist.
+- Appendix with the most useful built-in macros and runtime objects.
+
+`macros.md` lists the blank-app-safe macros by category (SQL/data, error/log, session/global,
+navigation/messages, include/library, date/number/encoding, email/API, auth/LDAP, files) and calls
+out the grid/form/button macros that do **not** apply to a Blank application.
 
 ## Install
 
